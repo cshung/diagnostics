@@ -10506,8 +10506,6 @@ DECLARE_API(DumpLog)
     return Status;
 }
 
-#ifdef TRACE_GC
-
 DECLARE_API (DumpGCLog)
 {
     INIT_API_NODAC();
@@ -10605,7 +10603,6 @@ exit:
 
     return Status;
 }
-#endif //TRACE_GC
 
 #ifndef FEATURE_PAL
 DECLARE_API (DumpGCConfigLog)
