@@ -1653,7 +1653,7 @@ BOOL FindSegment(const GCHeapDetails &heap, DacpHeapSegmentData &seg, CLRDATA_AD
                     return FALSE;
                 if (seg.Request(g_sos, dwAddrSeg, heap.original_heap_details) != S_OK)
                 {
-                    ExtOut("Error requesting heap segment %p\n", SOS_PTR(dwAddrSeg));
+                    ExtOut("Error requesting heap segment 24 %p\n", SOS_PTR(dwAddrSeg));
                     return FALSE;
                 }
                 if (addr >= TO_TADDR(seg.mem) &&
@@ -1673,7 +1673,7 @@ BOOL FindSegment(const GCHeapDetails &heap, DacpHeapSegmentData &seg, CLRDATA_AD
         // Request the initial segment.
         if (seg.Request(g_sos, dwAddrSeg, heap.original_heap_details) != S_OK)
         {
-            ExtOut("Error requesting heap segment %p.\n", SOS_PTR(dwAddrSeg));
+            ExtOut("Error requesting heap segment 25 %p.\n", SOS_PTR(dwAddrSeg));
             return FALSE;
         }
 
@@ -1690,7 +1690,7 @@ BOOL FindSegment(const GCHeapDetails &heap, DacpHeapSegmentData &seg, CLRDATA_AD
 
             if (seg.Request(g_sos, dwAddrSeg, heap.original_heap_details) != S_OK)
             {
-                ExtOut("Error requesting heap segment %p.\n", SOS_PTR(dwAddrSeg));
+                ExtOut("Error requesting heap segment 26 %p.\n", SOS_PTR(dwAddrSeg));
                 return FALSE;
             }
         }
