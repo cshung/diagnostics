@@ -630,15 +630,21 @@ void GCHeapInfo(const GCHeapDetails &heap, DWORD_PTR &total_allocated_size, DWOR
     ExtOut("%" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s\n", "segment", "begin", "allocated", "committed", "allocated size", "committed size");
     GCPrintSegmentInfo(heap, total_allocated_size, total_committed_size);
 
-    ExtOut("Large object heap starts at 0x%p\n",
-                  SOS_PTR(heap.generation_table[GetMaxGeneration() + 1].allocation_start));
+    if (!heap.has_regions)
+    {
+        ExtOut("Large object heap starts at 0x%p\n",
+                    SOS_PTR(heap.generation_table[GetMaxGeneration() + 1].allocation_start));
+    }
     ExtOut("%" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s  %" POINTERSIZE "s\n", "segment", "begin", "allocated", "committed", "allocated size", "committed size");
     GCPrintLargeHeapSegmentInfo(heap, total_allocated_size, total_committed_size);
 
     if (heap.has_poh)
     {
-        ExtOut("Pinned object heap starts at 0x%p\n",
-                      SOS_PTR(heap.generation_table[GetMaxGeneration() + 2].allocation_start));
+        if (!heap.has_regions)
+        {
+            ExtOut("Pinned object heap starts at 0x%p\n",
+                        SOS_PTR(heap.generation_table[GetMaxGeneration() + 2].allocation_start));
+        }
         GCPrintPinnedHeapSegmentInfo(heap, total_allocated_size, total_committed_size);
     }
 }
@@ -1409,7 +1415,6 @@ BOOL GCHeapTraverse(const GCHeapDetails &heap, AllocInfo* pallocInfo, VISITGCHEA
             return FALSE;
         }
 
-        // DWORD_PTR dwAddrCurrObj = (DWORD_PTR)heap.generation_table[GetMaxGeneration()].allocation_start;
         dwAddrCurrObj = (DWORD_PTR)segment.mem;
 
         BOOL bPrevFree = FALSE;
@@ -1543,7 +1548,6 @@ BOOL GCHeapTraverse(const GCHeapDetails &heap, AllocInfo* pallocInfo, VISITGCHEA
         return FALSE;
     }
 
-    // dwAddrCurrObj = (DWORD_PTR)heap.generation_table[GetMaxGeneration()+1].allocation_start;
     dwAddrCurrObj = (DWORD_PTR)segment.mem;
 
     dwAddrPrevObj=0;
@@ -2007,6 +2011,7 @@ GCHeapDetails *GCHeapSnapshot::GetHeap(CLRDATA_ADDRESS objectPointer)
 }
 
 // TODO: Do we need to handle the LOH here?
+// Perhaps we should consider reusing GCObjInHeap instead of having a new function here?
 int GCHeapSnapshot::GetGeneration(CLRDATA_ADDRESS objectPointer)
 {
     GCHeapDetails *pDetails = GetHeap(objectPointer);
@@ -2021,12 +2026,12 @@ int GCHeapSnapshot::GetGeneration(CLRDATA_ADDRESS objectPointer)
     // but rather with ULONG64 values (i.e. non-sign-extended 64-bit values)
     // We use the TO_TADDR below to ensure we won't break if this will ever
     // be fixed in the DAC.
-    if (taObj >= TO_TADDR(pDetails->generation_table[0].allocation_start) &&
+    if (taObj >= TO_TADDR(pDetails->generation_table[0].allocation_start) && // andrewau - ?
         taObj <= TO_TADDR(pDetails->alloc_allocated))
         return 0;
 
-    if (taObj >= TO_TADDR(pDetails->generation_table[1].allocation_start) &&
-        taObj <= TO_TADDR(pDetails->generation_table[0].allocation_start))
+    if (taObj >= TO_TADDR(pDetails->generation_table[1].allocation_start) && // andrewau - ?
+        taObj <= TO_TADDR(pDetails->generation_table[0].allocation_start))   // andrewau - ?
         return 1;
 
     return 2;
