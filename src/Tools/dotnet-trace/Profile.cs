@@ -24,6 +24,8 @@ namespace Microsoft.Diagnostics.Tools.Trace
 
         public bool Rundown { get; set; } = true;
 
+        public long? RundownKeyword { get; set; }
+
         public static void MergeProfileAndProviders(Profile selectedProfile, List<EventPipeProvider> providerCollection, Dictionary<string, string> enabledBy)
         {
             List<EventPipeProvider> profileProviders = new();

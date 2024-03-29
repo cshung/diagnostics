@@ -126,6 +126,7 @@ namespace Microsoft.Diagnostics.Tools.Trace
                 }
 
                 bool collectRundownEvents = true;
+                long? rundownKeyword = null;
 
                 if (profile.Length != 0)
                 {
@@ -138,6 +139,7 @@ namespace Microsoft.Diagnostics.Tools.Trace
                     }
 
                     collectRundownEvents = selectedProfile.Rundown;
+                    rundownKeyword = selectedProfile.RundownKeyword;
 
                     Profile.MergeProfileAndProviders(selectedProfile, providerCollection, enabledBy);
                 }
@@ -271,7 +273,8 @@ namespace Microsoft.Diagnostics.Tools.Trace
                         EventPipeSession session = null;
                         try
                         {
-                            session = diagnosticsClient.StartEventPipeSession(providerCollection, collectRundownEvents, (int)buffersize);
+                            EventPipeSessionConfiguration config = new(providerCollection, (int)buffersize, requestRundown: collectRundownEvents, requestStackwalk: true, rundownKeyword: rundownKeyword);
+                            session = diagnosticsClient.StartEventPipeSession(config);
                             if (resumeRuntime)
                             {
                                 try
