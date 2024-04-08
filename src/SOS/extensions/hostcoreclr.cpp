@@ -146,7 +146,7 @@ private:
 
 public:
     bool Open(const char* directory)
-    { 
+    {
         m_directory = directory;
         m_dir = opendir(directory);
         if (m_dir == nullptr) {
@@ -184,7 +184,7 @@ public:
                     fullFilename.append(m_entry->d_name);
 
                     struct stat sb;
-                    if (stat(fullFilename.c_str(), &sb) == 0) 
+                    if (stat(fullFilename.c_str(), &sb) == 0)
                     {
                         if (S_ISREG(sb.st_mode) || S_ISDIR(sb.st_mode)) {
                             return true;
@@ -205,7 +205,7 @@ public:
         }
     }
 
-    bool IsDirectory() 
+    bool IsDirectory()
     {
         return m_entry->d_type == DT_DIR;
     }
@@ -246,7 +246,7 @@ public:
         }
     }
 
-    bool IsDirectory() 
+    bool IsDirectory()
     {
         return (m_data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
     }
@@ -330,7 +330,7 @@ static std::string GetTpaListForRuntimeVersion(
     //
     //       There's currently no DLLs SOS requires that are of a higher version than those provided by
     //       the supported host frameworks. In case it's needed, add: a section here before AddFilesFromDirectoryToTpaList.
-    // 
+    //
     //           if (hostRuntimeVersion.Major < 5)
     //           {
     //               AddFileToTpaList(directory, "System.Collections.Immutable.dll", tpaList);
@@ -379,7 +379,7 @@ static bool FindDotNetVersion(const RuntimeVersion& runtimeVersion, std::string&
                     }
                 }
             }
-        } 
+        }
         while (find.Next());
     }
 
@@ -467,7 +467,7 @@ struct ProbingStrategy
 
 /**********************************************************************\
  * Returns the path to the coreclr to use for hosting and it's
- * directory. Attempts to use the best installed version of the 
+ * directory. Attempts to use the best installed version of the
  * runtime, otherwise it defaults to the target's runtime version.
 \**********************************************************************/
 static HRESULT GetHostRuntime(std::string& coreClrPath, std::string& hostRuntimeDirectory, RuntimeVersion& hostRuntimeVersion)
@@ -588,6 +588,21 @@ static HRESULT InitializeNetCoreHost()
         {
             return hr;
         }
+
+        ArrayHolder<CHAR> stresslog = new CHAR[MAX_LONGPATH];
+        if (GetEnvironmentVariableA("COMPlus_StressLog", stresslog, MAX_LONGPATH) != 0)
+        {
+            TraceHostingError("Turned off stresslog \n");
+            SetEnvironmentVariableA("COMPlus_StressLog", "0");
+        }
+
+        ArrayHolder<CHAR> gcname = new CHAR[MAX_LONGPATH];
+        if (GetEnvironmentVariableA("COMPlus_GCName", gcname, MAX_LONGPATH) != 0)
+        {
+            TraceHostingError("Turned off gcname \n");
+            SetEnvironmentVariableA("COMPlus_GCName", "");
+        }
+
 #ifdef FEATURE_PAL
         void* coreclrLib = dlopen(coreClrPath.c_str(), RTLD_NOW | RTLD_LOCAL);
         if (coreclrLib == nullptr)
@@ -675,7 +690,7 @@ static HRESULT InitializeNetCoreHost()
             return hr;
         }
     }
-    try 
+    try
     {
         hr = g_extensionsInitializeFunc(sosModulePath.c_str());
     }
