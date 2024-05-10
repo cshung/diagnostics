@@ -576,6 +576,27 @@ static HRESULT InitializeNetCoreHost()
         {
             return hr;
         }
+        
+        ArrayHolder<CHAR> stresslog = new CHAR[MAX_LONGPATH];
+        if (GetEnvironmentVariableA("COMPlus_StressLog", stresslog, MAX_LONGPATH) != 0)
+        {
+            TraceError("Turned off stresslog \n");
+            SetEnvironmentVariableA("COMPlus_StressLog", "0");
+        }
+        
+        ArrayHolder<CHAR> gcname = new CHAR[MAX_LONGPATH];
+        if (GetEnvironmentVariableA("COMPlus_GCName", gcname, MAX_LONGPATH) != 0)
+        {
+            TraceError("Turned off gcname \n");
+            SetEnvironmentVariableA("COMPlus_GCName", "");
+        }
+        
+        if (GetEnvironmentVariableA("COMPlus_DiagnosticPorts", stresslog, MAX_LONGPATH) != 0)
+        {
+            TraceError("Turned off DiagnosticPorts \n");
+            SetEnvironmentVariableA("COMPlus_DiagnosticPorts", "");
+        }
+
 #ifdef FEATURE_PAL
         void* coreclrLib = dlopen(coreClrPath.c_str(), RTLD_NOW | RTLD_LOCAL);
         if (coreclrLib == nullptr)
